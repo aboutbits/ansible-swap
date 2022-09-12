@@ -1,14 +1,14 @@
 ---
 - name: Check if swap file already exists
-  stat: path={{ swap_path }}
+  ansible.builtin.stat: path={{ swap_path }}
   register: swapfile
 
 - name: Create a swap file
-  shell: fallocate -l {{ swap_size }} {{ swap_path }}
+  ansible.builtin.shell: fallocate -l {{ swap_size }} {{ swap_path }}
   when: swapfile.stat.exists == False
 
 - name: Change permissions of swap file
-  file:
+  ansible.builtin.file:
     path: "{{ swap_path }}"
     state: file
     owner: root
@@ -17,29 +17,29 @@
   when: swapfile.stat.exists == False
 
 - name: Setup swap space
-  shell: mkswap {{ swap_path }}
+  ansible.builtin.shell: mkswap {{ swap_path }}
   when: swapfile.stat.exists == False
 
 - name: Enable swap space
-  shell: swapon {{ swap_path }}
+  ansible.builtin.shell: swapon {{ swap_path }}
   when: swapfile.stat.exists == False
 
 - name: Configure swapiness
-  sysctl:
+  ansible.builtin.sysctl:
     name: vm.swappiness
     value: "{{ swap_swappiness }}"
     state: present
   when: swapfile.stat.exists == False
 
 - name: Configure vfs_cache_pressure
-  sysctl:
+  ansible.builtin.sysctl:
     name: vm.swappiness
     value: "50"
     state: present
   when: swapfile.stat.exists == False
 
 - name: Manage swap file in /etc/fstab
-  mount:
+  ansible.builtin.mount:
     src: "{{ swap_path }}"
     name: "none"
     fstype: "swap"

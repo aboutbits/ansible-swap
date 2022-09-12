@@ -11,8 +11,9 @@ Swap creation role.
 
 ```yaml
 - hosts: all
-  roles:
-    - role: ansible-swap
+  tasks:
+    - ansible.builtin.include_role:
+        name: ansible-swap
       vars:
         swap_size: '1G'
 ```
